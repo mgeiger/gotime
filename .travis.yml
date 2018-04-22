@@ -1,29 +1,24 @@
-# Config file for automatic testing at travis-ci.org
-
 language: python
 python:
-  - 3.6
-  - 3.5
-  - 3.4
-  - 2.7
-
-# Command to install dependencies, e.g. pip install -r requirements.txt --use-mirrors
+- 3.6
+- 3.5
+- 3.4
+- 2.7
 install: pip install -U tox-travis
-
-# Command to run tests, e.g. python setup.py test
 script: tox
-
-# Assuming you have installed the travis-ci CLI tool, after you
-# create the Github repo and add it to Travis, run the
-# following command to finish PyPI deployment setup:
-# $ travis encrypt --add deploy.password
 deploy:
   provider: pypi
   distributions: sdist bdist_wheel
   user: mgeiger
   password:
-    secure: PLEASE_REPLACE_ME
+    secure: dAeirqsyFZfLgdcU8GNlpCnqYAF91GGqKYBaI/sNFJl0+t7wh274ZPsE2d9/Rggq3LwnK0/wCC7C3wbZ4tFLDmqnB9f1nMitdfUyOFD8gDxwmdItYFZmqYNujkbLty+Sx91Z8LvI75RbKVPLRD6aNVMcP4bNpB3IMc6czOYbaJEW8lF+yEU34y8SLTeyQp9avsUayV6NW5F33I7rTUlHmJwVpGdBMoTpQMwaYpyP1/rBznmWwFXNqexdM4zaYegmY+WwBRCfcZ3sBNpEMOL04NyHEhZLCa3bANVTFY92CmAKbBzECa/IDcHGP5fp1+FfnwSurMF93WzcFSh05cFcLDTJMWV520/xjp+uGGlC2LnIIYL/DlrYSXze3JWRtIp8j1PJTL8uNs+1kcBwB4OKqxKCrmIWBcES+SDhIdwkuvbKIRScn85Kzy8+yO4vweDDNJL5w9jShhHWSj0gzSvQsQTM+X+i2nXuy5B/y/JbzuygPQkp4oNbh87SedhDPKaK6F1/D48C4HiYiJKT5SzIcnI5DXNR5W85144+GZn3VpwpNUme6EPiuwvkv3Khf+JfUqdt2mAI2Q9v8EhnHnuYBl8qyhVI2cfmOS3ZYmvWcbxvoJqwi3/jeL8BCiRLDCEW+Gmls4O7XWV2ic0xXBpnw0DRjYa53KgFRqYYygSULu4=
   on:
     tags: true
     repo: mgeiger/gotime
     python: 3.6
+notifications:
+  slack:
+    secure: KJKMJAQ7J+AiGioJB/lVXXoEMDEPWes5NsAcx1abPONM2TB7TWb+zS+cMa5Mn6yjHdTHQa+i77DxUJFV/nF45HsHsX6wlLoZBgmSlZS7tI9oUSiEwupU+AwiJqr73tpKA4odavZQn7+hBLNsxCnCNJsKLYF01nS/1Z8+kYPA929JHBYxgp5gCtpKFcPtP2Q9pRQSDgd0nc7o7qfY32NaaAzSYQnVzNU53iRUgfYQdhMENwuwor4k/lWUgwUz2XZ6eV/WUlux/TZuTiKOZeu/i+9JM2jvelvYm0uvCmndf3nU1rBjxX3tuj3z6mPl8Pytd9d/6ewJJJheTFpN0roxpsdhATKBlJ/j8ryh5S5mm9Fyc8+5uwDMaZ+nw9IrbuVlm+OF45zBoneLFaQ/QQl3tOKl1SduL82y0tZ3nWeDV4MDX4NI55sE+P2D+ILClq3p5dYoPalsNs7AGFoc+jrpWRlN8wrAiznuucdEfRGV9K4g/R2vDZghkfzOosynQMBrDLLFEjaidR8BP7eUNrNhhuh+3C3QolLnH6Q7eV26QNXHHt3obpZv/d1gE+Y9uoj/2DqoltQqsn3yvVmUCV0pgJyqo/4vOQkAxoidd67K5hSZQiTV8mLsRWQyDhIHrN8j2wW168CcDiIxWUHZnqFriZQeVBZejrmkq27VYyFamSU=
+    on_success: change
+    on_failure: always
+
