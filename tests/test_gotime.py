@@ -2,7 +2,9 @@
 # -*- coding: utf-8 -*-
 
 """Tests for `gotime` package."""
+import os
 
+import mock
 import pytest
 
 from click.testing import CliRunner
@@ -36,3 +38,12 @@ def test_command_line_interface():
     help_result = runner.invoke(cli.main, ['--help'])
     assert help_result.exit_code == 0
     assert '--help  Show this message and exit.' in help_result.output
+
+
+@mock.patch.dict(os.environ, {'GOOGLE_MAPS_API_KEY': 'FAKEKEY',
+                              'BING_MAPS_API_KEY': 'FAKEKEY',
+                              'MAPQUEST_API_KEY': 'FAKEKEY'})
+def test_determine_keys_environmental_variables():
+    map_keys = gotime.determine_keys()
+    for map_key in map_keys:
+        assert map_keys[map_key]
