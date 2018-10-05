@@ -30,7 +30,8 @@ How long does it take to get from Point A to Point B
 Features
 --------
 
-* TODO
+* Determine the time it takes to go from one address to a second address
+* Works with a number of services included: Google Maps, Bing Maps, MapQuest
 
 Credits
 -------
