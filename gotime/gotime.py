@@ -2,6 +2,12 @@
 
 """Main module."""
 import os
+from enum import Enum
+
+class Keys(Enum):
+    GOOGLE = 'GOOGLE_MAPS_API_KEY'
+    BING = 'BING_MAPS_API_KEY'
+    MAPQUEST = 'MAPQUEST_API_KEY'
 
 
 class GoTime(object):
