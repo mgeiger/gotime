@@ -6,7 +6,7 @@ import sys
 
 import click
 
-from gotime import GoTime, Keys
+from gotime.gotime import GoTime, Keys
 
 
 @click.command()
@@ -15,28 +15,25 @@ from gotime import GoTime, Keys
 def main(start, end):
     """
     Give me a start location and an end location and
-    I will determine how long it will take to get there.
+    GoTime will determine how long it will take to get there.
 
-    I will be looking for environmental variables using 
-    the following format:
+    Environmental variables will be in the following format:
 
     `<SERVICE>_API_KEY`
 
     Where <SERVICE> can be any of the following:
-    
+
     * GOOGLE_MAPS\n
     * BING_MAPS\n
     * MAPQUEST
-
     """
     print(f"Going from {start} to {end}")
 
-    
     key_list = list()
     for key in Keys:
         key_list = (key.name, os.getenv(key.value, None))
 
-    gt = GoTime(key_list)
+    gt = GoTime(key_list)  # noqa: F841
 
     return 0
 
