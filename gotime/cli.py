@@ -27,7 +27,7 @@ def main(start, end):
     * BING_MAPS\n
     * MAPQUEST
     """
-    print(f"Going from {start} to {end}")
+    print("Going from {} to {}".format(start, end))
 
     key_list = list()
     for key in Keys:
