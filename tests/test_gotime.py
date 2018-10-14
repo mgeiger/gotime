@@ -6,7 +6,7 @@ import os
 import mock
 import pytest
 
-from gotime import gotime
+from gotime.gotime import determine_keys, GoTime, Keys
 
 
 @pytest.fixture
@@ -29,6 +29,14 @@ def test_content(response):
                               'BING_MAPS_API_KEY': 'FAKEKEY',
                               'MAPQUEST_API_KEY': 'FAKEKEY'})
 def test_determine_keys_environmental_variables():
-    map_keys = gotime.determine_keys()
+    map_keys = determine_keys()
     for map_key in map_keys:
         assert map_keys[map_key]
+
+
+@pytest.mark.xfail(reason="Working on implementation.")
+@mock.patch.dict(os.environ, {'GOOGLE_MAPS_API_KEY': 'FAKEKEY'})
+def test_google_maps_failure():
+    gt = GoTime(determine_keys())
+    times = gt.get_times()
+    assert times[Keys.GOOGLE]

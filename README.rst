@@ -13,10 +13,9 @@ GoTime
         :target: https://gotime.readthedocs.io/en/latest/?badge=latest
         :alt: Documentation Status
 
-
 .. image:: https://pyup.io/repos/github/mgeiger/gotime/shield.svg
-     :target: https://pyup.io/repos/github/mgeiger/gotime/
-     :alt: Updates
+        :target: https://pyup.io/repos/github/mgeiger/gotime/
+        :alt: Updates
 
 
 
