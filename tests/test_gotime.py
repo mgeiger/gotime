@@ -17,12 +17,14 @@ def response():
     """
     # import requests
     # return requests.get('https://github.com/audreyr/cookiecutter-pypackage')
+    pass
 
 
 def test_content(response):
     """Sample pytest test function with the pytest fixture as an argument."""
     # from bs4 import BeautifulSoup
     # assert 'GitHub' in BeautifulSoup(response.content).title.string
+    pass
 
 
 @mock.patch.dict(os.environ, {'GOOGLE_MAPS_API_KEY': 'FAKEKEY',
@@ -31,12 +33,15 @@ def test_content(response):
 def test_determine_keys_environmental_variables():
     map_keys = determine_keys()
     for map_key in map_keys:
-        assert map_keys[map_key]
+        assert map_keys[map_key], "{} not found in {}".format(map_key, map_keys)
 
 
-@pytest.mark.xfail(reason="Working on implementation.")
+# @pytest.mark.xfail(reason="Working on implementation.")
 @mock.patch.dict(os.environ, {'GOOGLE_MAPS_API_KEY': 'FAKEKEY'})
 def test_google_maps_failure():
     gt = GoTime(determine_keys())
     times = gt.get_times()
-    assert times[Keys.GOOGLE]
+    print(times)
+    print(Keys.GOOGLE)
+    assert times[Keys.GOOGLE], "{} not found in {}".format(Keys.GOOGLE, times)
+
