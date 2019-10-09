@@ -1,9 +1,7 @@
 language: python
-dist: xenial
+dist: bionic
 python:
 - 3.7
-- 3.6
-- 3.5
 install: pip install -U tox-travis
 script: tox
 deploy:
@@ -15,7 +13,7 @@ deploy:
   on:
     tags: true
     repo: mgeiger/gotime
-    python: 3.6
+    python: 3.7
 notifications:
   slack:
     secure: fhWGn5jdoTCjtGgoU5EH3q58PIWLC8Jddcnvuz0ca0dFIyZUJ3qwUt9Na6agoovaO1k8AVJxF/v+TUbji/9L5J20UegWZLZxb3OFDlxjMdLYsY5eqgKyXbVY6e+gVaXnEjVfVOR0NyljAPJbv6yXGyzPNioJXsA7pkPJoe5OKCnDVrQdVdFl3mY+Xbv59wU8NWfnVm5u9128R8KfRJ6WuJs7/i/RIMoVuw5wvNt+G8tQpViNa89VJ2Lz4pT/G81QWCY+ExUvI9vJdVaGyF7eHZCELnF3YScnLstRWhiNhKo5nAbMd2wROfXMXmXpATzPI0Y7jkePhGix/B3VJChPDoQzGWcbxyDcnJ4QcjO1lrCocykm/ddAtng5D3DK9zz76ZhnIAkabKSSuMxqN3NYARTSLvESaD8ozylCzH4UdjCIc5/xRMH/mNYXJwixCW0U0YNNRlLMwnfTLrLe3hIkTgj7ZMhDOcjWBbHJQZhNlP0pEWqCdHFhugnu6M2XK2ij9iVG9LX/iu4D8D6DZA/dwwTMgUMlzZkH9nXv2S01Z8T6iES9X+zYA5v+mLeHMKdfKmg8IRcd++nwgFynJ+yf6UxouZc5BmXpSAdbAxRogVul/rHpipDPgg8IpI8E4X/0pbC2Mb+i+9y/n4Xa8rXZXSuHyCni19bHAdPmYCtg56o=
