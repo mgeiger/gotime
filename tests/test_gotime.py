@@ -36,6 +36,13 @@ def test_determine_keys_environmental_variables():
         assert map_keys[map_key], "{} not found in {}".format(map_key, map_keys)
 
 
+@mock.patch.dict(os.environ, {'GOTIME_GOOGLE': 'FAKEKEY'})
+def test_bad_determine_keys_environmental_variables():
+    map_keys = determine_keys()
+    for map_key in map_keys:
+        assert not map_keys[map_key], "{} found in {}".format(map_key, map_keys)
+
+
 # @pytest.mark.xfail(reason="Working on implementation.")
 @mock.patch.dict(os.environ, {'GOOGLE_MAPS_API_KEY': 'FAKEKEY'})
 def test_google_maps_failure():
