@@ -6,14 +6,21 @@ GoTime
 .. image:: https://img.shields.io/pypi/v/gotime.svg
         :target: https://pypi.python.org/pypi/gotime
 
-.. image:: https://img.shields.io/pypi/pyversions/gotime   :alt: PyPI - Python Version
+.. image:: https://img.shields.io/pypi/pyversions/gotime
+        :alt: PyPI - Python Version
 
-.. image:: https://img.shields.io/pypi/status/gotime   :alt: PyPI - Status
+.. image:: https://img.shields.io/pypi/status/gotime
+        :alt: PyPI - Status
 
-.. image:: https://img.shields.io/pypi/dm/gotime   :alt: PyPI - Downloads
+.. image:: https://img.shields.io/pypi/dm/gotime
+        :alt: PyPI - Downloads
 
 .. image:: https://img.shields.io/travis/mgeiger/gotime.svg
         :target: https://travis-ci.org/mgeiger/gotime
+
+.. image:: https://api.codeclimate.com/v1/badges/4ce6aa8b7e540fd923a2/maintainability
+        :target: https://codeclimate.com/github/mgeiger/gotime/maintainability
+        :alt: Maintainability
 
 .. image:: https://readthedocs.org/projects/gotime/badge/?version=latest
         :target: https://gotime.readthedocs.io/en/latest/?badge=latest
