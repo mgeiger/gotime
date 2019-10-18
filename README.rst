@@ -10,6 +10,8 @@ GoTime
 
 .. image:: https://img.shields.io/pypi/status/gotime   :alt: PyPI - Status
 
+.. image:: https://img.shields.io/pypi/dm/gotime   :alt: PyPI - Downloads
+
 .. image:: https://img.shields.io/travis/mgeiger/gotime.svg
         :target: https://travis-ci.org/mgeiger/gotime
 
