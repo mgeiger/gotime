@@ -5,31 +5,24 @@ GoTime
 
 .. image:: https://img.shields.io/pypi/v/gotime.svg
         :target: https://pypi.python.org/pypi/gotime
-
 .. image:: https://img.shields.io/pypi/pyversions/gotime
         :alt: PyPI - Python Version
-
 .. image:: https://img.shields.io/pypi/status/gotime
         :alt: PyPI - Status
-
 .. image:: https://img.shields.io/pypi/dm/gotime
         :alt: PyPI - Downloads
 
 .. image:: https://img.shields.io/travis/mgeiger/gotime.svg
         :target: https://travis-ci.org/mgeiger/gotime
-
 .. image:: https://api.codeclimate.com/v1/badges/4ce6aa8b7e540fd923a2/maintainability
         :target: https://codeclimate.com/github/mgeiger/gotime/maintainability
         :alt: Maintainability
-
 .. image:: https://readthedocs.org/projects/gotime/badge/?version=latest
         :target: https://gotime.readthedocs.io/en/latest/?badge=latest
         :alt: Documentation Status
-
 .. image:: https://pyup.io/repos/github/mgeiger/gotime/shield.svg
         :target: https://pyup.io/repos/github/mgeiger/gotime/
         :alt: Updates
-
 
 
 How long does it take to get from Point A to Point B
@@ -44,6 +37,7 @@ Features
 
 * Determine the time it takes to go from one address to a second address
 * Works with a number of services included: Google Maps, Bing Maps, MapQuest
+* Can be used as a command line call or via Python imports
 
 Installation
 ------------
@@ -74,8 +68,10 @@ Not properly implemented.
 Credits
 -------
 
-A huge shoutout to @mkazin for the project idea and the initial code.
+A huge shoutout to mkazin_ for the project idea and the initial code.
 Though most of the original code has been destroyed, the idea lives on.
+
+.. _mkazin: https://github.com/mkazin
 
 This package was created with Cookiecutter_ and the `audreyr/cookiecutter-pypackage`_ project template.
 
