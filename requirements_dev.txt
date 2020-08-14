@@ -10,6 +10,6 @@ pytest-watch==4.2.0
 tox==3.14.5
 twine==3.1.1
 watchdog==0.10.2
-wheel==0.34.2
+wheel==0.35.1
 Click==7.1.1
 Sphinx==2.4.4
