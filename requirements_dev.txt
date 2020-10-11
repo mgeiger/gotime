@@ -8,7 +8,7 @@ pytest==5.4.1
 pytest-runner==5.2
 pytest-watch==4.2.0
 tox==3.14.5
-twine==3.1.1
+twine==3.2.0
 watchdog==0.10.2
 wheel==0.34.2
 Click==7.1.2
