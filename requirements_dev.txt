@@ -12,4 +12,4 @@ twine==3.2.0
 watchdog==0.10.3
 wheel==0.34.2
 Click==7.1.2
-Sphinx==2.4.4
+Sphinx==3.2.1
