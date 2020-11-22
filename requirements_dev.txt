@@ -9,7 +9,7 @@ pytest-runner==5.2
 pytest-watch==4.2.0
 tox==3.20.1
 twine==3.2.0
-watchdog==0.10.3
+watchdog==0.10.4
 wheel==0.35.1
 Click==7.1.2
 Sphinx==3.2.1
