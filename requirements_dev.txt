@@ -1,6 +1,6 @@
 bump2version==1.0.1
 flake8==3.9.1
-coverage==5.5
+coverage==6.2
 mock==4.0.3
 pip==21.1
 pylint==2.8.2
