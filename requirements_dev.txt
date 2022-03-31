@@ -10,5 +10,5 @@ tox==3.24.5
 twine==3.8.0
 watchdog==2.1.6
 wheel==0.37.1
-Click==8.0.4
+Click==8.1.1
 Sphinx==4.5.0
