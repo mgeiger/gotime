@@ -63,7 +63,7 @@ class AzureMaps(Provider):
         r = requests.get(url)
         self._last_json = r.json()
 
-    def _parse_data(self, data: dict=None):
+    def _parse_data(self, data: dict = None):
         if data is None:
             data = self._last_json
 
@@ -103,7 +103,7 @@ class BingMaps(Provider):
         r = requests.get(url)
         self._last_json = r.json()
 
-    def _parse_data(self, data: dict=None):
+    def _parse_data(self, data: dict = None):
         if data is None:
             data = self._last_json
         resource = data['resourceSets'][0]['resources'][0]
@@ -151,7 +151,7 @@ class GoogleMaps(Provider):
         r = requests.get(url)
         self._last_json = r.json()
 
-    def _parse_data(self, data: dict=None):
+    def _parse_data(self, data: dict = None):
         if data is None:
             data = self._last_json
         legs = data['routes'][0]['legs']
@@ -197,7 +197,7 @@ class HereMaps(Provider):
         r = requests.get(url)
         self._last_json = r.json()
 
-    def _parse_data(self, data: dict=None):
+    def _parse_data(self, data: dict = None):
         if data is None:
             data = self._last_json
         summary = data['response']['route'][0]['summary']
@@ -237,7 +237,7 @@ class MapBoxMaps(Provider):
         r = requests.get(url)
         self._last_json = r.json()
 
-    def _parse_data(self, data: dict=None):
+    def _parse_data(self, data: dict = None):
         if data is None:
             data = self._last_json
         route = data['routes'][0]
@@ -274,11 +274,11 @@ class MapQuestMaps(Provider):
         destination = "{}%2C{}".format(end.latitude, end.longitude)
         url = f'https://www.mapquestapi.com/directions/v2/route?key={self.key}&from={origin}&to={destination}'
         # N.B. we request in KM
-        url += f'&doReverseGeocode=false&routeType=fastest&unit=k'
+        url += '&doReverseGeocode=false&routeType=fastest&unit=k'
         r = requests.get(url)
         self._last_json = r.json()
 
-    def _parse_data(self, data: dict=None):
+    def _parse_data(self, data: dict = None):
         if data is None:
             data = self._last_json
         route = data['route']
@@ -314,7 +314,7 @@ class TomTomMaps(Provider):
         r = requests.get(url)
         self._last_json = r.json()
 
-    def _parse_data(self, data: dict=None):
+    def _parse_data(self, data: dict = None):
         if data is None:
             data = self._last_json
         summary = data['routes'][0]['summary']
