@@ -1,0 +1,24 @@
+# configure updates globally
+update: insecure
+
+# set the default branch
+branch: master
+
+# update schedule
+schedule: "every two weeks on sunday"
+
+# configure dependency pinning globally
+pin: True
+
+# search for requirement files
+search: True
+
+# add a label to pull requests, default is not set
+label_prs: update
+
+# assign users to pull requests, default is not set
+assignees:
+ - mgeiger
+
+# allow to close stale PRs
+close_prs: True
