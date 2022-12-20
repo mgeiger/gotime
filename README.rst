@@ -65,6 +65,31 @@ Import
 
 Not properly implemented.
 
+
+CI Setup
+~~~~~~~~
+
+.. mermaid::
+    :alt: The image alternate text for HTML output
+    :align: center
+    :caption: Caption Text underneath the generated image
+
+    sequenceDiagram
+      participant Alice
+      participant Bob
+      Alice->John: Hello John, how are you?
+      loop Healthcheck
+          John->John: Fight against hypochondria
+      end
+      Note right of John: Rational thoughts <br/>prevail...
+      John-->Alice: Great!
+      John->Bob: How about you?
+
+
+
+      Bob-->John: Jolly good!      
+
+
 Credits
 -------
 
