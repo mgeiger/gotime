@@ -41,5 +41,3 @@ def test_command_line_help(runner):
     assert help_result.exit_code == 0
     assert '--help' in help_result.output
     assert 'Show this message and exit.' in help_result.output
-
-

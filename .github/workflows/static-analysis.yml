@@ -1,4 +1,11 @@
-name: Dur
+# This Action will perform all static analysis on the code under question
+# Static Analysis will consist of:
+#   flake8 - Style Enforcement
+#   mypy   - Type Checking
+#   black  - Formatting Check
+#   radon  - Cycloclometric Complexity
+name: Static Analysis
+
 on:
   push:
     branches:
@@ -6,13 +13,14 @@ on:
   pull_request:
     branches:
       - "main"
+
 jobs:
-  Dur:
+  static-analysis:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v2
-      - name: Test
-        run: echo "running tests"
-      - name: Deploy
-        run: echo "Deploying"
+      - name: Environment setup
+        run: echo "Running Setup"
+      - name: Flake8
+        run: echo "Executing Flake8 Checks"
         if: github.head_ref == 'main'

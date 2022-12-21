@@ -1,0 +1,14 @@
+# This Workflow will ensure that we have pushed to the main branch
+# Then ensure we can properly package the product
+# Then deploy with a version to pypy
+name: Deploy Python Package
+on:
+  pull_request:
+    branches:
+    - "main"
+jobs:
+  deploy-package:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Setup
+        run: echo "Setting System Up"

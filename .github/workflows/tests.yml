@@ -1,4 +1,4 @@
-name: Something
+name: Tests Execution
 on:
   push:
     branches:
@@ -7,7 +7,7 @@ on:
     branches:
       - "main"
 jobs:
-  Something:
+  python-tests:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v2
