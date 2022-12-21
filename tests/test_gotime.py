@@ -51,4 +51,3 @@ def test_google_maps_failure():
     print(times)
     print(Keys.GOOGLE)
     assert times[Keys.GOOGLE], "{} not found in {}".format(Keys.GOOGLE, times)
-

@@ -1,6 +1,7 @@
 import time
 
 import requests
+from typing import Optional
 
 
 class Location:
@@ -63,7 +64,7 @@ class AzureMaps(Provider):
         r = requests.get(url)
         self._last_json = r.json()
 
-    def _parse_data(self, data: dict = None):
+    def _parse_data(self, data: Optional[dict] = None):
         if data is None:
             data = self._last_json
 
@@ -103,7 +104,7 @@ class BingMaps(Provider):
         r = requests.get(url)
         self._last_json = r.json()
 
-    def _parse_data(self, data: dict = None):
+    def _parse_data(self, data: Optional[dict] = None):
         if data is None:
             data = self._last_json
         resource = data['resourceSets'][0]['resources'][0]
@@ -151,7 +152,7 @@ class GoogleMaps(Provider):
         r = requests.get(url)
         self._last_json = r.json()
 
-    def _parse_data(self, data: dict = None):
+    def _parse_data(self, data: Optional[dict] = None):
         if data is None:
             data = self._last_json
         legs = data['routes'][0]['legs']
@@ -197,22 +198,22 @@ class HereMaps(Provider):
         r = requests.get(url)
         self._last_json = r.json()
 
-    def _parse_data(self, data: dict = None):
+    def _parse_data(self, data: Optional[dict] = None) -> None:
         if data is None:
             data = self._last_json
-        summary = data['response']['route'][0]['summary']
+        summary = data['response']['route'][0]['summary']  # type: ignore
         distance = summary['distance'] / 1000.0
         duration = summary['trafficTime']
         self._last_result = Result(
             provider=self.name,
             distance=distance,
             duration=duration
-        )
+        )  # type: ignore
 
     def get_result(self, start: Location, end: Location) -> Result:
         self._request_data(start, end)
         self._parse_data()
-        return self._last_result
+        return self._last_result  # type: ignore
 
     def __str__(self):
         return f"<{self.__class__.__bases__[0].__name__}> {self.name}: {self.primary[:6]}, {self.secondary[:6]}"
@@ -237,22 +238,22 @@ class MapBoxMaps(Provider):
         r = requests.get(url)
         self._last_json = r.json()
 
-    def _parse_data(self, data: dict = None):
+    def _parse_data(self, data: Optional[dict] = None):
         if data is None:
             data = self._last_json
-        route = data['routes'][0]
+        route = data['routes'][0]  # type: ignore
         distance = route['distance'] / 1000.0
         duration = route['duration']
 
         self._last_result = Result(
             provider=self.name,
             distance=distance,
-            duration=duration)
+            duration=duration)  # type: ignore
 
     def get_result(self, start: Location, end: Location) -> Result:
         self._request_data(start, end)
         self._parse_data()
-        return self._last_result
+        return self._last_result  # type: ignore
 
     def __str__(self):
         return f"<{self.__class__.__bases__[0].__name__}> {self.name}: {self.key[:6]}"
@@ -278,22 +279,22 @@ class MapQuestMaps(Provider):
         r = requests.get(url)
         self._last_json = r.json()
 
-    def _parse_data(self, data: dict = None):
+    def _parse_data(self, data: Optional[dict] = None):
         if data is None:
             data = self._last_json
-        route = data['route']
+        route = data['route']  # type: ignore
         distance = route['distance']
         duration = route['realTime']
         fuel_used = route['fuelUsed']
         steps = len(route['legs'][0]['maneuvers'])
         self._last_result = Result(provider=self.name, distance=distance,
                                    duration=duration, steps=steps,
-                                   fuel_used=fuel_used)
+                                   fuel_used=fuel_used)  # type: ignore
 
     def get_result(self, start: Location, end: Location) -> Result:
         self._request_data(start, end)
         self._parse_data()
-        return self._last_result
+        return self._last_result  # type: ignore
 
     def __str__(self):
         return f"<{self.__class__.__bases__[0].__name__}> {self.name}: key={self.key[:6]}"
@@ -314,16 +315,16 @@ class TomTomMaps(Provider):
         r = requests.get(url)
         self._last_json = r.json()
 
-    def _parse_data(self, data: dict = None):
+    def _parse_data(self, data: Optional[dict] = None):
         if data is None:
             data = self._last_json
-        summary = data['routes'][0]['summary']
+        summary = data['routes'][0]['summary']  # type: ignore
         # TODO: What is the storage data units?
         duration = summary['travelTimeInSeconds']
         distance = summary['lengthInMeters'] / 1000.0
         self._last_result = Result(provider=self.name,
                                    distance=distance,
-                                   duration=duration)
+                                   duration=duration)  # type: ignore
 
     def get_result(self, start: Location, end: Location):
         self._request_data(start, end)
