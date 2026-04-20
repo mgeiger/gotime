@@ -1,0 +1,207 @@
+name: release
+
+on:
+  push:
+    tags:
+      - "[0-9][0-9][0-9][0-9].[0-9]+.[0-9]+"
+      - "[0-9][0-9][0-9][0-9].[0-9]+.[0-9]+a[0-9]+"
+      - "[0-9][0-9][0-9][0-9].[0-9]+.[0-9]+b[0-9]+"
+      - "[0-9][0-9][0-9][0-9].[0-9]+.[0-9]+rc[0-9]+"
+
+permissions:
+  contents: read
+
+jobs:
+  # ---------------------------------------------------------------------------
+  # 1. Verify the tag. We only publish signed annotated tags that point at a
+  #    commit reachable from main. This catches typos, lightweight tags, and
+  #    accidental tags on feature branches before we spend minutes building.
+  # ---------------------------------------------------------------------------
+  verify-tag:
+    name: verify tag
+    runs-on: ubuntu-latest
+    outputs:
+      version: ${{ steps.parse.outputs.version }}
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          ref: ${{ github.ref }}
+
+      - id: parse
+        name: Parse version from tag
+        run: |
+          version="${GITHUB_REF_NAME}"
+          if ! [[ "${version}" =~ ^[0-9]{4}\.[0-9]+\.[0-9]+(a[0-9]+|b[0-9]+|rc[0-9]+)?$ ]]; then
+              echo "::error::tag '${version}' does not match YYYY.MINOR.MICRO[(a|b|rc)N]"
+              exit 1
+          fi
+          echo "version=${version}" >> "$GITHUB_OUTPUT"
+
+      - name: Assert annotated tag
+        run: |
+          if [[ "$(git cat-file -t "${GITHUB_REF_NAME}")" != "tag" ]]; then
+              echo "::error::'${GITHUB_REF_NAME}' is a lightweight tag; release tags must be annotated (git tag --annotate --sign)"
+              exit 1
+          fi
+
+      - name: Assert tag is reachable from main
+        run: |
+          git fetch --no-tags origin main:refs/remotes/origin/main
+          if ! git merge-base --is-ancestor "${GITHUB_SHA}" refs/remotes/origin/main; then
+              echo "::error::tag '${GITHUB_REF_NAME}' points at ${GITHUB_SHA}, which is not reachable from origin/main"
+              exit 1
+          fi
+
+      - name: Assert CHANGELOG section exists
+        run: python .github/scripts/extract_changelog.py "${{ steps.parse.outputs.version }}" > /dev/null
+
+  # ---------------------------------------------------------------------------
+  # 2. Build sdist + wheel with hatch-vcs driving the version from the tag.
+  # ---------------------------------------------------------------------------
+  build:
+    name: build sdist + wheel
+    needs: verify-tag
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - uses: astral-sh/setup-uv@v3
+      - run: uv python install 3.13
+
+      - name: Build
+        run: |
+          uv venv --python 3.13 .venv
+          . .venv/bin/activate
+          uv pip install build
+          python -m build
+
+      - name: Assert wheel version matches tag
+        run: |
+          expected="${{ needs.verify-tag.outputs.version }}"
+          wheel=$(ls dist/gotime-*.whl)
+          actual=$(basename "${wheel}" | sed --regexp-extended 's/^gotime-([^-]+)-.*\.whl$/\1/')
+          if [[ "${actual}" != "${expected}" ]]; then
+              echo "::error::wheel version ${actual} != tag ${expected}"
+              exit 1
+          fi
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: dist
+          path: dist/
+          retention-days: 7
+
+  # ---------------------------------------------------------------------------
+  # 3. Generate SLSA build provenance for every artifact in dist/. Proves the
+  #    published files came from this commit on this repo using this workflow.
+  # ---------------------------------------------------------------------------
+  attest:
+    name: attest build provenance
+    needs: build
+    runs-on: ubuntu-latest
+    permissions:
+      id-token: write
+      attestations: write
+      contents: read
+    steps:
+      - uses: actions/download-artifact@v4
+        with:
+          name: dist
+          path: dist
+
+      - uses: actions/attest-build-provenance@v2
+        with:
+          subject-path: "dist/*"
+
+  # ---------------------------------------------------------------------------
+  # 4. Publish to PyPI via OIDC Trusted Publishing. The 'pypi' GitHub
+  #    Environment requires a reviewer to approve the deployment, which is our
+  #    human gate between "tag pushed" and "artifact on PyPI".
+  # ---------------------------------------------------------------------------
+  publish-pypi:
+    name: publish to PyPI
+    needs: [verify-tag, build, attest]
+    runs-on: ubuntu-latest
+    environment:
+      name: pypi
+      url: https://pypi.org/project/gotime/${{ needs.verify-tag.outputs.version }}/
+    permissions:
+      id-token: write
+    steps:
+      - uses: actions/download-artifact@v4
+        with:
+          name: dist
+          path: dist
+
+      - uses: pypa/gh-action-pypi-publish@release/v1
+
+  # ---------------------------------------------------------------------------
+  # 5. Create the GitHub Release with the body pulled directly from
+  #    CHANGELOG.md so the three surfaces never drift.
+  # ---------------------------------------------------------------------------
+  release:
+    name: GitHub Release
+    needs: [verify-tag, publish-pypi]
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - uses: actions/download-artifact@v4
+        with:
+          name: dist
+          path: dist
+
+      - name: Extract CHANGELOG section
+        id: notes
+        run: |
+          {
+              echo 'body<<EOF'
+              python .github/scripts/extract_changelog.py "${{ needs.verify-tag.outputs.version }}"
+              echo 'EOF'
+          } >> "$GITHUB_OUTPUT"
+
+      - uses: softprops/action-gh-release@v2
+        with:
+          tag_name: ${{ github.ref_name }}
+          name: ${{ needs.verify-tag.outputs.version }}
+          body: ${{ steps.notes.outputs.body }}
+          files: dist/*
+          prerelease: ${{ contains(needs.verify-tag.outputs.version, 'a') || contains(needs.verify-tag.outputs.version, 'b') || contains(needs.verify-tag.outputs.version, 'rc') }}
+
+  # ---------------------------------------------------------------------------
+  # 6. Install from PyPI in a clean image and prove the CLI actually works.
+  #    PyPI is eventually consistent; we retry the install a few times.
+  # ---------------------------------------------------------------------------
+  smoke-test:
+    name: smoke-test PyPI install
+    needs: [verify-tag, publish-pypi]
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.13"
+
+      - name: Install from PyPI
+        env:
+          VERSION: ${{ needs.verify-tag.outputs.version }}
+        run: |
+          for attempt in 1 2 3 4 5; do
+              if pip install "gotime==${VERSION}"; then
+                  break
+              fi
+              echo "PyPI not yet consistent (attempt ${attempt}); sleeping 30s..."
+              sleep 30
+          done
+          installed=$(gotime --version)
+          if [[ "${installed}" != "${VERSION}" ]]; then
+              echo "::error::installed gotime --version == '${installed}', expected '${VERSION}'"
+              exit 1
+          fi
+          gotime providers list

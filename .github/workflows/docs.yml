@@ -1,0 +1,38 @@
+name: docs
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - "docs/**"
+      - "src/**"
+      - ".readthedocs.yaml"
+      - ".github/workflows/docs.yml"
+  pull_request:
+    paths:
+      - "docs/**"
+      - "src/**"
+      - ".readthedocs.yaml"
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - uses: astral-sh/setup-uv@v3
+      - run: uv python install 3.13
+      - name: Install with docs extras
+        run: |
+          uv venv --python 3.13 .venv
+          . .venv/bin/activate
+          uv pip install --editable ".[docs]"
+      - name: Sphinx build
+        run: |
+          . .venv/bin/activate
+          sphinx-build -W -b html docs docs/_build/html
+      - uses: actions/upload-artifact@v4
+        with:
+          name: docs-html
+          path: docs/_build/html
