@@ -1,48 +1,116 @@
-# This workflow will install Python dependencies, run tests and lint with a variety of Python versions
-# For more information see: https://help.github.com/actions/language-and-framework-guides/using-python-with-github-actions
-
-name: CI
+name: ci
 
 on:
-  push:
-    branches: [ $default-branch ]
   pull_request:
-    branches: [ $default-branch ]
+  push:
+    branches: [main]
 
 jobs:
-  ci-execution:
+  lint-test:
+    name: lint + test (${{ matrix.db }})
     runs-on: ubuntu-latest
     strategy:
       fail-fast: false
       matrix:
-        python-version: ["3.10", "3.11"]
+        db: [sqlite, postgres]
+
+    services:
+      postgres:
+        image: postgres:18
+        env:
+          POSTGRES_USER: gotime
+          POSTGRES_PASSWORD: gotime
+          POSTGRES_DB: gotime_test
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd "pg_isready -U gotime"
+          --health-interval 5s
+          --health-timeout 3s
+          --health-retries 20
 
     steps:
-    - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0  # hatch-vcs needs tags
 
-    - name: Set up Python ${{ matrix.python-version }}
-      uses: actions/setup-python@v3
-      with:
-        python-version: ${{ matrix.python-version }}
+      - name: Install uv
+        uses: astral-sh/setup-uv@v3
 
-    - name: Install dependencies
-      run: |
-        python -m pip install --upgrade pip
-        python -m pip install flake8 pytest mypy
-        if [ -f requirements_dev.txt ]; then pip install -r requirements_dev.txt; fi
+      - name: Set up Python 3.13
+        run: uv python install 3.13
 
-    # - name: Type Checking
-    #   run: |
-    #     mypy --install-types
-    #     mypy $(git ls-files "*.py")
+      - name: Create venv and install
+        run: |
+          uv venv --python 3.13 .venv
+          . .venv/bin/activate
+          uv pip install --editable ".[dev,postgres]"
 
-    - name: Lint with flake8
-      run: |
-        # stop the build if there are Python syntax errors or undefined names
-        flake8 . --count --select=E9,F63,F7,F82 --show-source --statistics
-        # exit-zero treats all errors as warnings. The GitHub editor is 127 chars wide
-        flake8 . --count --exit-zero --max-complexity=10 --max-line-length=127 --statistics
+      - name: Black
+        run: . .venv/bin/activate && black --check src tests
 
-    - name: Test with pytest
-      run: |
-        pytest
+      - name: Ruff
+        run: . .venv/bin/activate && ruff check src tests
+
+      - name: mypy
+        run: . .venv/bin/activate && mypy || true  # non-blocking initially
+
+      - name: Alembic upgrade (postgres only)
+        if: matrix.db == 'postgres'
+        env:
+          GOTIME_DATABASE_URL: postgresql+psycopg2://gotime:gotime@localhost:5432/gotime_test
+        run: . .venv/bin/activate && alembic upgrade head
+
+      - name: Pytest with coverage
+        env:
+          GOTIME_DATABASE_URL: ${{ matrix.db == 'postgres' && 'postgresql+psycopg2://gotime:gotime@localhost:5432/gotime_test' || 'sqlite:///./ci.sqlite3' }}
+        run: . .venv/bin/activate && pytest
+
+      - name: Upload coverage artifact
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: coverage-${{ matrix.db }}
+          path: coverage.xml
+
+  changelog:
+    name: changelog entry
+    runs-on: ubuntu-latest
+    if: github.event_name == 'pull_request'
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Detect whether a CHANGELOG entry is required
+        env:
+          BASE: ${{ github.event.pull_request.base.sha }}
+          HEAD: ${{ github.event.pull_request.head.sha }}
+        run: |
+          set -euo pipefail
+
+          # Repo maintainers can waive the gate by labelling the PR.
+          if [[ "${{ contains(github.event.pull_request.labels.*.name, 'skip-changelog') }}" == "true" ]]; then
+              echo "'skip-changelog' label applied - CHANGELOG entry is optional."
+              exit 0
+          fi
+
+          touches_code=$(
+              git diff --name-only "${BASE}" "${HEAD}" \
+                | grep --extended-regexp '^(src/gotime/|alembic/|pyproject\.toml$)' \
+                || true
+          )
+          if [[ -z "${touches_code}" ]]; then
+              echo "PR only changes non-shipping files; CHANGELOG entry not required."
+              exit 0
+          fi
+
+          if git diff --name-only "${BASE}" "${HEAD}" | grep --fixed-strings --quiet 'CHANGELOG.md'; then
+              echo "CHANGELOG.md was updated."
+              exit 0
+          fi
+
+          echo "::error::This PR modifies src/gotime/, alembic/, or pyproject.toml but does not update CHANGELOG.md."
+          echo "::error::Add an entry under '## [Unreleased]' using a Keep-a-Changelog subsection (Added / Changed / ... / Security),"
+          echo "::error::or apply the 'skip-changelog' label if this PR ships no user-visible change."
+          exit 1

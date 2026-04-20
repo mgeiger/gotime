@@ -1,0 +1,39 @@
+name: integration
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+jobs:
+  live-apis:
+    runs-on: ubuntu-latest
+    environment: live-apis
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - uses: astral-sh/setup-uv@v3
+
+      - name: Set up Python 3.13
+        run: uv python install 3.13
+
+      - name: Install
+        run: |
+          uv venv --python 3.13 .venv
+          . .venv/bin/activate
+          uv pip install --editable ".[dev]"
+
+      - name: Run integration tests with live API keys
+        env:
+          GOOGLE_MAPS_API_KEY: ${{ secrets.GOOGLE_MAPS_API_KEY }}
+          BING_MAPS_API_KEY: ${{ secrets.BING_MAPS_API_KEY }}
+          TOMTOM_API_KEY: ${{ secrets.TOMTOM_API_KEY }}
+          HERE_API_KEY: ${{ secrets.HERE_API_KEY }}
+          MAPQUEST_API_KEY: ${{ secrets.MAPQUEST_API_KEY }}
+          MAPBOX_API_KEY: ${{ secrets.MAPBOX_API_KEY }}
+          AZURE_MAPS_API_KEY: ${{ secrets.AZURE_MAPS_API_KEY }}
+        run: |
+          . .venv/bin/activate
+          pytest -m integration -v --no-cov
