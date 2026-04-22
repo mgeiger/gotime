@@ -2,7 +2,7 @@
 update: insecure
 
 # set the default branch
-branch: master
+branch: main
 
 # update schedule
 schedule: "every two weeks on sunday"
